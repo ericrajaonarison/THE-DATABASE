@@ -4,201 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professional Contact Directory</title>
-    <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
-        * {
-            font-family: 'Liberation Mono', monospace !important;
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            padding-top: 120px;
-            color: #333;
-        }
-
-        .sticky-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            padding: 1rem 2rem;
-            z-index: 1000;
-            border-bottom: 2px solid #000;
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .title {
-            text-transform: uppercase;
-            font-weight: 600;
-            font-size: 1.2rem;
-            margin: 0 0 1rem 0;
-            text-align: left;
-        }
-
-        .search-container {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 10px;
-        }
-
-        .search-group {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .search-field {
-            padding: 10px;
-            border: 2px solid #000;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-
-        .edit-button {
-            padding: 10px 20px;
-            border: 2px solid #000;
-            background: white;
-            cursor: pointer;
-            text-transform: uppercase;
-            height: 40px;
-        }
-
-        table {
-            width: 100%;
-            max-width: 1200px;
-            margin: 20px auto;
-            border: 2px solid #000;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 12px;
-            border: 1px solid #000;
-            text-align: left;
-            text-transform: uppercase;
-        }
-
-        th {
-            background: #f0f0f0;
-            font-weight: 600;
-        }
-
-        .location-toggle {
-            cursor: pointer;
-            text-decoration: underline dotted;
-        }
-
-        .address-info {
-            display: none;
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        tr:hover {
-            background-color: #0066cc !important;
-            color: #ff69b4 !important;
-            cursor: pointer;
-        }
-
-        .edit-input {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #000;
-            background: white;
-            margin-bottom: 5px;
-        }
-
-        .delete-btn {
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-
-        .add-button {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 40px;
-            border: 2px solid #000;
-            background: white;
-            cursor: pointer;
-            font-size: 1.5rem;
-            display: none;
-        }
-
-        em {
-            color: #666;
-            font-style: italic;
-        }
-
-        .password-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .password-box {
-            background: white;
-            padding: 2rem;
-            border: 2px solid #000;
-            text-align: center;
-            width: 300px;
-        }
-
-        .password-input {
-            margin: 1rem 0;
-            padding: 10px;
-            border: 2px solid #000;
-            width: 100%;
-            text-transform: uppercase;
-            font-size: 1rem;
-        }
-
-        .password-button {
-            padding: 10px 20px;
-            border: 2px solid #000;
-            background: white;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin: 0 5px;
-        }
-
-        .admin-warning {
-            font-size: 0.9em;
-            color: #ff4444;
-            margin-top: 1rem;
-            font-weight: bold;
-        }
-
-        .password-box h3 {
-            color: #ff4444;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-        }
+        /* CSS-Code bleibt unverändert */
+        * { font-family: 'Liberation Mono', monospace !important; box-sizing: border-box; }
+        body { margin: 0; padding-top: 120px; color: #333; }
+        .sticky-header { position: fixed; top: 0; left: 0; right: 0; background: white; padding: 1rem 2rem; z-index: 1000; border-bottom: 2px solid #000; }
+        .header-container { max-width: 1200px; margin: 0 auto; }
+        .title { text-transform: uppercase; font-weight: 600; font-size: 1.2rem; margin: 0 0 1rem 0; text-align: left; }
+        .search-container { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+        .search-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .search-field { padding: 10px; border: 2px solid #000; font-size: 14px; text-transform: uppercase; }
+        .edit-button { padding: 10px 20px; border: 2px solid #000; background: white; cursor: pointer; text-transform: uppercase; height: 40px; }
+        table { width: 100%; max-width: 1200px; margin: 20px auto; border: 2px solid #000; border-collapse: collapse; }
+        th, td { padding: 12px; border: 1px solid #000; text-align: left; text-transform: uppercase; }
+        th { background: #f0f0f0; font-weight: 600; }
+        .location-toggle { cursor: pointer; text-decoration: underline dotted; }
+        .address-info { display: none; color: #666; font-size: 0.9em; margin-top: 5px; }
+        tr:hover { background-color: #0066cc !important; color: #ff69b4 !important; cursor: pointer; }
+        .edit-input { width: 100%; padding: 5px; border: 1px solid #000; background: white; margin-bottom: 5px; }
+        .delete-btn { background: #ff4444; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px; }
+        .add-button { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; border: 2px solid #000; background: white; cursor: pointer; font-size: 1.5rem; display: none; }
+        em { color: #666; font-style: italic; }
+        .password-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .password-box { background: white; padding: 2rem; border: 2px solid #000; text-align: center; width: 300px; }
+        .password-input { margin: 1rem 0; padding: 10px; border: 2px solid #000; width: 100%; text-transform: uppercase; font-size: 1rem; }
+        .password-button { padding: 10px 20px; border: 2px solid #000; background: white; cursor: pointer; text-transform: uppercase; margin: 0 5px; }
+        .admin-warning { font-size: 0.9em; color: #ff4444; margin-top: 1rem; font-weight: bold; }
+        .password-box h3 { color: #ff4444; margin-bottom: 1.5rem; text-transform: uppercase; }
     </style>
 </head>
 <body>
+    <!-- HTML-Struktur bleibt unverändert -->
     <div class="sticky-header">
         <div class="header-container">
             <h1 class="title">THE DATABASE</h1>
@@ -220,9 +58,7 @@
                 <button class="password-button" onclick="checkPassword()">UNLOCK</button>
                 <button class="password-button" onclick="cancelPassword()">CANCEL</button>
             </div>
-            <div class="admin-warning">
-                RESTRICTED AREA - AUTHORIZED PERSONNEL ONLY
-            </div>
+            <div class="admin-warning">RESTRICTED AREA - AUTHORIZED PERSONNEL ONLY</div>
         </div>
     </div>
 
@@ -237,9 +73,7 @@
                 <th>CONTACT</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Daten werden dynamisch geladen -->
-        </tbody>
+        <tbody></tbody>
     </table>
     <button class="add-button" id="addButton">+</button>
 
@@ -249,7 +83,7 @@
             apiKey: "AIzaSyAXXMbw_b8fXhCqt06W4B6-QA9TWAuKPfw",
             authDomain: "the-database-c6fbd.firebaseapp.com",
             projectId: "the-database-c6fbd",
-            storageBucket: "the-database-c6fbd.firebasestorage.app",
+            storageBucket: "the-database-c6fbd.appspot.com",
             messagingSenderId: "125527143888",
             appId: "1:125527143888:web:0af66a517950850583b5d5"
         };
@@ -257,8 +91,8 @@
         // Firebase Initialisierung
         let db;
         try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
+            const app = firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore(app);
         } catch (error) {
             console.error('Firebase initialization error:', error);
         }
@@ -267,44 +101,60 @@
         const ADMIN_PASS = () => String.fromCharCode(48,48,48,48);
         let editMode = false;
         let contacts = [];
-        const editButton = document.getElementById('editButton');
-        const addButton = document.getElementById('addButton');
-        const passwordOverlay = document.getElementById('passwordOverlay');
-        const passwordInput = document.getElementById('passwordInput');
-        const translations = {
-            'tänzer': ['dancer'],
-            'düster': ['moody'],
-            'zuverlässig': ['reliable'],
-            'kreuzberg': ['crossberg']
-        };
         const contactsRef = db.collection("contacts");
+        const elements = {
+            editButton: document.getElementById('editButton'),
+            addButton: document.getElementById('addButton'),
+            passwordOverlay: document.getElementById('passwordOverlay'),
+            passwordInput: document.getElementById('passwordInput'),
+            search: document.getElementById('search'),
+            location: document.getElementById('location')
+        };
 
         // Event Listener
         document.addEventListener('DOMContentLoaded', initContacts);
-        editButton.addEventListener('click', toggleEditMode);
-        addButton.addEventListener('click', addNewContact);
-        document.getElementById('search').addEventListener('input', filterContacts);
-        document.getElementById('location').addEventListener('input', filterContacts);
-        passwordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') checkPassword();
-        });
+        elements.editButton.addEventListener('click', toggleEditMode);
+        elements.addButton.addEventListener('click', addNewContact);
+        elements.search.addEventListener('input', filterContacts);
+        elements.location.addEventListener('input', filterContacts);
+        elements.passwordInput.addEventListener('keypress', (e) => e.key === 'Enter' && checkPassword());
 
         // Hauptfunktionen
         async function initContacts() {
             try {
                 const snapshot = await contactsRef.get();
                 contacts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                if (contacts.length === 0) await addSampleContact();
-                renderContacts();
+                
+                if (contacts.length === 0) {
+                    await createSampleContact();
+                }
+                
                 setupRealtimeUpdates();
+                renderContacts();
             } catch (error) {
-                console.error('Error loading contacts:', error);
+                console.error('Error initializing contacts:', error);
             }
         }
 
         function setupRealtimeUpdates() {
             contactsRef.onSnapshot(snapshot => {
-                contacts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                contacts = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        name: data.name || '',
+                        category: data.category || '',
+                        city: data.city || '',
+                        address: data.address || '',
+                        instagram: data.instagram || '',
+                        info: data.info || '',
+                        contact: data.contact || '',
+                        keywords: data.keywords || '',
+                        tags: data.tags || ''
+                    };
+                });
+                
+                if (contacts.length === 0) createSampleContact();
                 renderContacts();
             });
         }
@@ -316,10 +166,10 @@
             contacts.forEach((contact, index) => {
                 const row = document.createElement('tr');
                 row.className = 'contact';
-                row.dataset.keywords = contact.keywords?.toLowerCase() || '';
-                row.dataset.city = contact.city?.toLowerCase() || '';
+                row.dataset.keywords = (contact.keywords || '').toLowerCase();
+                row.dataset.city = (contact.city || '').toLowerCase();
                 row.dataset.address = contact.address || '';
-                row.dataset.tags = contact.tags?.toLowerCase() || '';
+                row.dataset.tags = (contact.tags || '').toLowerCase();
 
                 row.innerHTML = `
                     <td>${contact.name || '<em>Name</em>'}</td>
@@ -337,24 +187,24 @@
             });
 
             if (editMode) {
-                document.querySelectorAll('.contact').forEach((row, index) => {
-                    enableRowEditing(row, index);
-                });
+                document.querySelectorAll('.contact').forEach((row, index) => enableRowEditing(row, index));
             }
 
             filterContacts();
         }
 
-        // Editierfunktionen
+        // Bearbeitungsfunktionen
         function toggleEditMode() {
             editMode ? saveChanges() : showPasswordPrompt();
         }
 
         async function saveChanges() {
             try {
-                await Promise.all(contacts.map(async (contact) => {
+                const batch = db.batch();
+                contacts.forEach(contact => {
                     if (contact.id) {
-                        await contactsRef.doc(contact.id).update({
+                        const docRef = contactsRef.doc(contact.id);
+                        batch.update(docRef, {
                             name: contact.name,
                             category: contact.category,
                             city: contact.city,
@@ -366,18 +216,19 @@
                             tags: contact.tags
                         });
                     }
-                }));
+                });
+                await batch.commit();
                 exitEditMode();
             } catch (error) {
                 console.error('Error saving changes:', error);
-                alert('Fehler beim Speichern der Änderungen');
+                alert('Error saving changes');
             }
         }
 
         function exitEditMode() {
             editMode = false;
-            editButton.textContent = 'EDIT';
-            addButton.style.display = 'none';
+            elements.editButton.textContent = 'EDIT';
+            elements.addButton.style.display = 'none';
             renderContacts();
         }
 
@@ -385,85 +236,37 @@
             const contact = contacts[index];
             const cells = row.cells;
             
-            // Name cell with delete button
-            cells[0].innerHTML = `
-                <input class="edit-input" value="${contact.name || ''}" placeholder="Name">
-                <button class="delete-btn">DELETE</button>
-            `;
-            const nameInput = cells[0].querySelector('input');
-            nameInput.addEventListener('input', (e) => {
-                contacts[index].name = e.target.value;
-            });
+            // Input-Felder
+            cells[0].innerHTML = `<input class="edit-input" value="${contact.name}" placeholder="Name"><button class="delete-btn">DELETE</button>`;
+            cells[1].innerHTML = `<input class="edit-input" value="${contact.category}" placeholder="Category">`;
+            cells[2].innerHTML = `<input class="edit-input" value="${contact.city}" placeholder="City"><input class="edit-input" value="${contact.address}" placeholder="Address">`;
+            cells[3].innerHTML = `<input class="edit-input" value="${contact.instagram}" placeholder="@instagram">`;
+            cells[4].innerHTML = `<input class="edit-input" value="${contact.info}" placeholder="Info"><input class="edit-input" value="${contact.tags}" placeholder="Tags">`;
+            cells[5].innerHTML = `<textarea class="edit-input" style="height:60px">${(contact.contact || '').replace(/<br>/g, '\n')}</textarea>`;
 
-            // Category cell
-            cells[1].innerHTML = `
-                <input class="edit-input" value="${contact.category || ''}" placeholder="Category">
-            `;
-            const categoryInput = cells[1].querySelector('input');
-            categoryInput.addEventListener('input', (e) => {
-                contacts[index].category = e.target.value;
-            });
+            // Event-Listener für Inputs
+            cells[0].querySelector('input').addEventListener('input', e => contact.name = e.target.value);
+            cells[1].querySelector('input').addEventListener('input', e => contact.category = e.target.value);
+            cells[2].querySelectorAll('input')[0].addEventListener('input', e => contact.city = e.target.value);
+            cells[2].querySelectorAll('input')[1].addEventListener('input', e => contact.address = e.target.value);
+            cells[3].querySelector('input').addEventListener('input', e => contact.instagram = e.target.value);
+            cells[4].querySelectorAll('input')[0].addEventListener('input', e => contact.info = e.target.value);
+            cells[4].querySelectorAll('input')[1].addEventListener('input', e => contact.tags = e.target.value);
+            cells[5].querySelector('textarea').addEventListener('input', e => contact.contact = e.target.value.replace(/\n/g, '<br>'));
 
-            // City and Address cell
-            cells[2].innerHTML = `
-                <input class="edit-input" value="${contact.city || ''}" placeholder="City">
-                <input class="edit-input" value="${contact.address || ''}" placeholder="Address">
-            `;
-            const cityInput = cells[2].querySelectorAll('input')[0];
-            const addressInput = cells[2].querySelectorAll('input')[1];
-            cityInput.addEventListener('input', (e) => {
-                contacts[index].city = e.target.value;
-            });
-            addressInput.addEventListener('input', (e) => {
-                contacts[index].address = e.target.value;
-            });
-
-            // Instagram cell
-            cells[3].innerHTML = `
-                <input class="edit-input" value="${contact.instagram || ''}" placeholder="@instagram">
-            `;
-            const instagramInput = cells[3].querySelector('input');
-            instagramInput.addEventListener('input', (e) => {
-                contacts[index].instagram = e.target.value;
-            });
-
-            // Info and Tags cell
-            cells[4].innerHTML = `
-                <input class="edit-input" value="${contact.info || ''}" placeholder="Info">
-                <input class="edit-input" value="${contact.tags || ''}" placeholder="Tags">
-            `;
-            const infoInput = cells[4].querySelectorAll('input')[0];
-            const tagsInput = cells[4].querySelectorAll('input')[1];
-            infoInput.addEventListener('input', (e) => {
-                contacts[index].info = e.target.value;
-            });
-            tagsInput.addEventListener('input', (e) => {
-                contacts[index].tags = e.target.value;
-            });
-
-            // Contact cell (textarea)
-            cells[5].innerHTML = `
-                <textarea class="edit-input" style="height:60px">${(contact.contact || '').replace(/<br>/g, '\n')}</textarea>
-            `;
-            const contactTextarea = cells[5].querySelector('textarea');
-            contactTextarea.addEventListener('input', (e) => {
-                contacts[index].contact = e.target.value.replace(/\n/g, '<br>');
-            });
-
-            // Delete button
+            // Lösch-Button
             cells[0].querySelector('.delete-btn').addEventListener('click', async () => {
-                try {
-                    await contactsRef.doc(contacts[index].id).delete();
-                    contacts.splice(index, 1);
-                    renderContacts();
-                } catch (error) {
-                    console.error('Error deleting contact:', error);
+                if (confirm('Delete this contact permanently?')) {
+                    try {
+                        await contactsRef.doc(contact.id).delete();
+                    } catch (error) {
+                        console.error('Error deleting contact:', error);
+                    }
                 }
             });
         }
 
-        // Weitere Funktionen
-        async function addSampleContact() {
+        async function createSampleContact() {
             try {
                 await contactsRef.add({
                     name: 'MAX MUSTERMANN',
@@ -477,13 +280,13 @@
                     tags: 'kreuzberg urban'
                 });
             } catch (error) {
-                console.error('Error adding sample contact:', error);
+                console.error('Error creating sample contact:', error);
             }
         }
 
         async function addNewContact() {
             try {
-                const initialData = {
+                await contactsRef.add({
                     name: '',
                     category: '',
                     city: '',
@@ -493,12 +296,7 @@
                     contact: '',
                     keywords: '',
                     tags: ''
-                };
-                const docRef = await contactsRef.add(initialData);
-                contacts.push({ id: docRef.id, ...initialData });
-                renderContacts();
-                const newRow = document.querySelector('#contactsTable tbody tr:last-child');
-                if (newRow) enableRowEditing(newRow, contacts.length - 1);
+                });
             } catch (error) {
                 console.error('Error adding new contact:', error);
             }
@@ -506,42 +304,38 @@
 
         // Passwortfunktionen
         function showPasswordPrompt() {
-            passwordOverlay.style.display = 'flex';
-            passwordInput.focus();
+            elements.passwordOverlay.style.display = 'flex';
+            elements.passwordInput.focus();
         }
 
         function checkPassword() {
-            if (passwordInput.value === ADMIN_PASS()) {
-                passwordOverlay.style.display = 'none';
-                passwordInput.value = '';
-                startEditMode();
+            if (elements.passwordInput.value === ADMIN_PASS()) {
+                elements.passwordOverlay.style.display = 'none';
+                elements.passwordInput.value = '';
+                editMode = true;
+                elements.editButton.textContent = 'SAVE';
+                elements.addButton.style.display = 'block';
+                renderContacts();
             } else {
-                alert('ACCESS DENIED: Invalid admin credentials');
-                passwordInput.value = '';
+                alert('ACCESS DENIED: Invalid credentials');
+                elements.passwordInput.value = '';
             }
         }
 
         function cancelPassword() {
-            passwordOverlay.style.display = 'none';
-            passwordInput.value = '';
-        }
-
-        function startEditMode() {
-            editMode = true;
-            editButton.textContent = 'SAVE';
-            addButton.style.display = 'block';
-            renderContacts();
+            elements.passwordOverlay.style.display = 'none';
+            elements.passwordInput.value = '';
         }
 
         // Filterfunktionen
         function filterContacts() {
-            const searchTerm = document.getElementById('search').value.toLowerCase();
-            const locationTerm = document.getElementById('location').value.toLowerCase();
+            const searchTerm = elements.search.value.toLowerCase();
+            const locationTerm = elements.location.value.toLowerCase();
             
             document.querySelectorAll('.contact').forEach(contact => {
-                const keywords = contact.dataset.keywords || '';
-                const tags = contact.dataset.tags || '';
-                const cities = contact.dataset.city || '';
+                const keywords = contact.dataset.keywords;
+                const tags = contact.dataset.tags;
+                const cities = contact.dataset.city;
                 const instagram = contact.cells[3].textContent.toLowerCase();
 
                 const searchMatch = searchTerm.split(/\s+/).every(term =>
@@ -563,14 +357,22 @@
             return [term, ...(translations[term] || [])];
         }
 
-        // Event Listener für Adressanzeige
-        document.querySelector('table').addEventListener('click', function(e) {
-            if(e.target.classList.contains('location-toggle') && !editMode) {
+        // Adress-Anzeige
+        document.querySelector('table').addEventListener('click', e => {
+            if (e.target.classList.contains('location-toggle') && !editMode) {
                 const addressInfo = e.target.nextElementSibling;
                 addressInfo.style.display = addressInfo.style.display === 'block' ? 'none' : 'block';
                 addressInfo.textContent = e.target.parentElement.parentElement.dataset.address;
             }
         });
+
+        // Initialisierung
+        const translations = {
+            'tänzer': ['dancer'],
+            'düster': ['moody'],
+            'zuverlässig': ['reliable'],
+            'kreuzberg': ['crossberg']
+        };
     </script>
 </body>
 </html>
