@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Contact Directory</title>
+    <style>
+        * {
+            font-family: 'Liberation Mono', monospace !important;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding-top: 120px;
+            color: #333;
+        }
+
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 1rem 2rem;
+            z-index: 1000;
+            border-bottom: 2px solid #000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .title {
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 0 0 1rem 0;
+            text-align: left;
+        }
+
+        .search-container {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+        }
+
+        .search-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .search-field {
+            padding: 10px;
+            border: 2px solid #000;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .edit-button {
+            padding: 10px 20px;
+            border: 2px solid #000;
+            background: white;
+            cursor: pointer;
+            text-transform: uppercase;
+            height: 40px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            border: 2px solid #000;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #000;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        th {
+            background: #f0f0f0;
+            font-weight: 600;
+        }
+
+        .location-toggle {
+            cursor: pointer;
+            text-decoration: underline dotted;
+        }
+
+        .address-info {
+            display: none;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        tr:hover {
+            background-color: #0066cc !important;
+            color: #ff69b4 !important;
+            cursor: pointer;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #000;
+            background: white;
+            margin-bottom: 5px;
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .add-button {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            border: 2px solid #000;
+            background: white;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: none;
+        }
+
+        em {
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Passwort-Overlay Styles */
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .password-box {
+            background: white;
+            padding: 2rem;
+            border: 2px solid #000;
+            text-align: center;
+            width: 300px;
+        }
+
+        .password-input {
+            margin: 1rem 0;
+            padding: 10px;
+            border: 2px solid #000;
+            width: 100%;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        .password-button {
+            padding: 10px 20px;
+            border: 2px solid #000;
+            background: white;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin: 0 5px;
+        }
+
+        .admin-warning {
+            font-size: 0.9em;
+            color: #ff4444;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        .password-box h3 {
+            color: #ff4444;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="sticky-header">
+        <div class="header-container">
+            <h1 class="title">THE DATABASE</h1>
+            <div class="search-container">
+                <div class="search-group">
+                    <input type="text" class="search-field" id="search" placeholder="SEARCH...">
+                    <input type="text" class="search-field" id="location" placeholder="CITY...">
+                </div>
+                <button class="edit-button" id="editButton">EDIT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Passwort-Eingabe Overlay -->
+    <div class="password-overlay" id="passwordOverlay">
+        <div class="password-box">
+            <h3>ADMIN ACCESS REQUIRED</h3>
+            <input type="password" class="password-input" id="passwordInput" placeholder="ADMIN PASSWORD" autocomplete="off">
+            <div>
+                <button class="password-button" onclick="checkPassword()">UNLOCK</button>
+                <button class="password-button" onclick="cancelPassword()">CANCEL</button>
+            </div>
+            <div class="admin-warning">
+                RESTRICTED AREA - AUTHORIZED PERSONNEL ONLY
+            </div>
+        </div>
+    </div>
+
+    <table id="contactsTable">
+        <thead>
+            <tr>
+                <th>NAME</th>
+                <th>CATEGORY</th>
+                <th>CITY</th>
+                <th>INSTAGRAM</th>
+                <th>INFO</th>
+                <th>CONTACT</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Daten werden dynamisch geladen -->
+        </tbody>
+    </table>
+    <button class="add-button" id="addButton">+</button>
+
+    <script>
+       // Firebase Configuration (Mit deinen Daten ersetzen)
+const firebaseConfig = {
+  apiKey: "AIzaSyAXXMbw_b8fXhCqt06W4B6-QA9TWAuKPfw",
+  authDomain: "the-database-c6fbd.firebaseapp.com",
+  projectId: "the-database-c6fbd",
+  storageBucket: "the-database-c6fbd.firebasestorage.app",
+  messagingSenderId: "125527143888",
+  appId: "1:125527143888:web:0af66a517950850583b5d5",
+};
+
+// Firebase Initialisierung
+let db;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+} catch (error) {
+  console.error('Firebase initialization error:', error);
+}
+
+// Passwort als kombinierter Hex-Code (entspricht "0000")
+const ADMIN_PASS = () => String.fromCharCode(48,48,48,48);
+
+let editMode = false;
+let contacts = [];
+let originalContacts = [];
+const editButton = document.getElementById('editButton');
+const addButton = document.getElementById('addButton');
+const passwordOverlay = document.getElementById('passwordOverlay');
+const passwordInput = document.getElementById('passwordInput');
+const translations = {
+  'tänzer': ['dancer'], 'düster': ['moody'],
+  'zuverlässig': ['reliable'], 'kreuzberg': ['crossberg']
+};
+
+// Firestore Collection Referenz
+const contactsRef = db.collection("contacts");
+
+// Initialisierung
+document.addEventListener('DOMContentLoaded', initContacts);
+
+async function initContacts() {
+  try {
+    const snapshot = await contactsRef.get();
+    contacts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    if (contacts.length === 0) {
+      await addSampleContact();
+    }
+    
+    renderContacts();
+    setupRealtimeUpdates();
+  } catch (error) {
+    console.error('Error loading contacts:', error);
+  }
+}
+
+async function addSampleContact() {
+  try {
+    await contactsRef.add({
+      name: 'MAX MUSTERMANN',
+      category: 'DANCER',
+      city: 'BERLIN',
+      address: 'MUSTERSTRASSE 12, 10115 BERLIN',
+      instagram: '@maxdance',
+      info: 'CONTEMPORARY SPECIALIST',
+      contact: '+49 123 456789<br>max@dance.com',
+      keywords: 'max dancer tänzer reliable zuverlässig',
+      tags: 'kreuzberg urban'
+    });
+  } catch (error) {
+    console.error('Error adding sample contact:', error);
+  }
+}
+
+function setupRealtimeUpdates() {
+  contactsRef.onSnapshot(snapshot => {
+    contacts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderContacts();
+  });
+}
+
+// Ab hier bleiben die Funktionen renderContacts, toggleEditMode, checkPassword usw. gleich,
+// mit folgenden Anpassungen:
+
+async function saveChanges() {
+  try {
+    await Promise.all(contacts.map(async (contact, index) => {
+      if (contact.id) {
+        await contactsRef.doc(contact.id).update(contact);
+      }
+    }));
+    
+    editMode = false;
+    editButton.textContent = 'EDIT';
+    addButton.style.display = 'none';
+    renderContacts();
+  } catch (error) {
+    console.error('Error saving changes:', error);
+    alert('Error saving changes to database');
+  }
+}
+
+async function saveRowChanges(row, index) {
+  const cells = row.cells;
+  
+  contacts[index] = {
+    ...contacts[index],
+    name: cells[0].querySelector('input')?.value || '',
+    category: cells[1].querySelector('input')?.value || '',
+    city: cells[2].querySelector('input')?.value || '',
+    address: cells[2].querySelectorAll('input')[1]?.value || '',
+    instagram: cells[3].querySelector('input')?.value || '',
+    info: cells[4].querySelector('input')?.value || '',
+    contact: cells[5].querySelector('textarea')?.value.replace(/\n/g, '<br>') || '',
+    tags: cells[4].querySelectorAll('input')[1]?.value || '',
+    keywords: `${cells[0].querySelector('input')?.value || ''} 
+             ${cells[1].querySelector('input')?.value || ''} 
+             ${cells[3].querySelector('input')?.value || ''}`.toLowerCase()
+  };
+}
+
+// In enableRowEditing beim Delete-Button:
+cells[0].querySelector('.delete-btn').addEventListener('click', async () => {
+  try {
+    await contactsRef.doc(contacts[index].id).delete();
+  } catch (error) {
+    console.error('Error deleting contact:', error);
+  }
+});
+
+// In addNewContact:
+async function addNewContact() {
+  try {
+    const newContact = {
+      name: '',
+      category: '',
+      city: '',
+      address: '',
+      instagram: '',
+      info: '',
+      contact: '',
+      keywords: '',
+      tags: ''
+    };
+    
+    const docRef = await contactsRef.add(newContact);
+    contacts.push({ id: docRef.id, ...newContact });
+    renderContacts();
+    
+    const newRow = document.querySelector('#contactsTable tbody tr:last-child');
+    if (newRow) {
+      enableRowEditing(newRow, contacts.length - 1);
+    }
+  } catch (error) {
+    console.error('Error adding new contact:', error);
+  }
+}
+
+// Rest der Event-Listener und Filterfunktionen bleibt gleich
