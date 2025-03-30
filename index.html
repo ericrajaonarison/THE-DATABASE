@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Contact Directory</title>
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <style>
+        /* Dein vollständiger CSS-Code bleibt hier unverändert */
+        * {
+            font-family: 'Liberation Mono', monospace !important;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding-top: 120px;
+            color: #333;
+        }
+
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 1rem 2rem;
+            z-index: 1000;
+            border-bottom: 2px solid #000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .title {
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 0 0 1rem 0;
+            text-align: left;
+        }
+
+        .search-container {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+        }
+
+        .search-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .search-field {
+            padding: 10px;
+            border: 2px solid #000;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .edit-button {
+            padding: 10px 20px;
+            border: 2px solid #000;
+            background: white;
+            cursor: pointer;
+            text-transform: uppercase;
+            height: 40px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            border: 2px solid #000;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #000;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        th {
+            background: #f0f0f0;
+            font-weight: 600;
+        }
+
+        .location-toggle {
+            cursor: pointer;
+            text-decoration: underline dotted;
+        }
+
+        .address-info {
+            display: none;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        tr:hover {
+            background-color: #0066cc !important;
+            color: #ff69b4 !important;
+            cursor: pointer;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #000;
+            background: white;
+            margin-bottom: 5px;
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .add-button {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            border: 2px solid #000;
+            background: white;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: none;
+        }
+
+        em {
+            color: #666;
+            font-style: italic;
+        }
+
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .password-box {
+            background: white;
+            padding: 2rem;
+            border: 2px solid #000;
+            text-align: center;
+            width: 300px;
+        }
+
+        .password-input {
+            margin: 1rem 0;
+            padding: 10px;
+            border: 2px solid #000;
+            width: 100%;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        .password-button {
+            padding: 10px 20px;
+            border: 2px solid #000;
+            background: white;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin: 0 5px;
+        }
+
+        .admin-warning {
+            font-size: 0.9em;
+            color: #ff4444;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        .password-box h3 {
+            color: #ff4444;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="sticky-header">
+        <div class="header-container">
+            <h1 class="title">THE DATABASE</h1>
+            <div class="search-container">
+                <div class="search-group">
+                    <input type="text" class="search-field" id="search" placeholder="SEARCH...">
+                    <input type="text" class="search-field" id="location" placeholder="CITY...">
+                </div>
+                <button class="edit-button" id="editButton">EDIT</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="password-overlay" id="passwordOverlay">
+        <div class="password-box">
+            <h3>ADMIN ACCESS REQUIRED</h3>
+            <input type="password" class="password-input" id="passwordInput" placeholder="ADMIN PASSWORD" autocomplete="off">
+            <div>
+                <button class="password-button" onclick="checkPassword()">UNLOCK</button>
+                <button class="password-button" onclick="cancelPassword()">CANCEL</button>
+            </div>
+            <div class="admin-warning">
+                RESTRICTED AREA - AUTHORIZED PERSONNEL ONLY
+            </div>
+        </div>
+    </div>
+
+    <table id="contactsTable">
+        <thead>
+            <tr>
+                <th>NAME</th>
+                <th>CATEGORY</th>
+                <th>CITY</th>
+                <th>INSTAGRAM</th>
+                <th>INFO</th>
+                <th>CONTACT</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Daten werden dynamisch geladen -->
+        </tbody>
+    </table>
+    <button class="add-button" id="addButton">+</button>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXXMbw_b8fXhCqt06W4B6-QA9TWAuKPfw",
+            authDomain: "the-database-c6fbd.firebaseapp.com",
+            projectId: "the-database-c6fbd",
+            storageBucket: "the-database-c6fbd.firebasestorage.app",
+            messagingSenderId: "125527143888",
+            appId: "1:125527143888:web:0af66a517950850583b5d5"
+        };
+
+        // Firebase Initialisierung
+        let db;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+        }
+
+        // Konstante und Variablen
+        const ADMIN_PASS = () => String.fromCharCode(48,48,48,48);
+        let editMode = false;
+        let contacts = [];
+        const editButton = document.getElementById('editButton');
+        const addButton = document.getElementById('addButton');
+        const passwordOverlay = document.getElementById('passwordOverlay');
+        const passwordInput = document.getElementById('passwordInput');
+        const translations = {
+            'tänzer': ['dancer'],
+            'düster': ['moody'],
+            'zuverlässig': ['reliable'],
+            'kreuzberg': ['crossberg']
+        };
+        const contactsRef = db.collection("contacts");
+
+        // Event Listener
+        document.addEventListener('DOMContentLoaded', initContacts);
+        editButton.addEventListener('click', toggleEditMode);
+        addButton.addEventListener('click', addNewContact);
+        document.getElementById('search').addEventListener('input', filterContacts);
+        document.getElementById('location').addEventListener('input', filterContacts);
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        // Hauptfunktionen
+        async function initContacts() {
+            try {
+                const snapshot = await contactsRef.get();
+                contacts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (contacts.length === 0) await addSampleContact();
+                renderContacts();
+                setupRealtimeUpdates();
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+            }
+        }
+
+        function setupRealtimeUpdates() {
+            contactsRef.onSnapshot(snapshot => {
+                contacts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderContacts();
+            });
+        }
+
+        function renderContacts() {
+            const tbody = document.querySelector('#contactsTable tbody');
+            tbody.innerHTML = '';
+
+            contacts.forEach((contact, index) => {
+                const row = document.createElement('tr');
+                row.className = 'contact';
+                row.dataset.keywords = contact.keywords?.toLowerCase() || '';
+                row.dataset.city = contact.city?.toLowerCase() || '';
+                row.dataset.address = contact.address || '';
+                row.dataset.tags = contact.tags?.toLowerCase() || '';
+
+                row.innerHTML = `
+                    <td>${contact.name || '<em>Name</em>'}</td>
+                    <td>${contact.category || '<em>Category</em>'}</td>
+                    <td>
+                        <span class="location-toggle">${contact.city || '<em>City</em>'}</span>
+                        <div class="address-info"></div>
+                    </td>
+                    <td>${contact.instagram || '<em>@instagram</em>'}</td>
+                    <td>${contact.info || '<em>Info</em>'}</td>
+                    <td>${(contact.contact || '<em>Contact</em>').replace(/<br>/g, '\n')}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            if (editMode) {
+                document.querySelectorAll('.contact').forEach((row, index) => {
+                    enableRowEditing(row, index);
+                });
+            }
+
+            filterContacts();
+        }
+
+        // Editierfunktionen
+        function toggleEditMode() {
+            editMode ? saveChanges() : showPasswordPrompt();
+        }
+
+        async function saveChanges() {
+            try {
+                await Promise.all(contacts.map(async (contact, index) => {
+                    if (contact.id) await contactsRef.doc(contact.id).update(contact);
+                }));
+                exitEditMode();
+            } catch (error) {
+                console.error('Error saving changes:', error);
+                alert('Error saving changes to database');
+            }
+        }
+
+        function exitEditMode() {
+            editMode = false;
+            editButton.textContent = 'EDIT';
+            addButton.style.display = 'none';
+            renderContacts();
+        }
+
+        function enableRowEditing(row, index) {
+            const contact = contacts[index];
+            const cells = row.cells;
+            
+            cells[0].innerHTML = `
+                <input class="edit-input" value="${contact.name}" placeholder="Name">
+                <button class="delete-btn">DELETE</button>
+            `;
+
+            cells[1].innerHTML = `
+                <input class="edit-input" value="${contact.category}" placeholder="Category">
+            `;
+
+            cells[2].innerHTML = `
+                <input class="edit-input" value="${contact.city}" placeholder="City">
+                <input class="edit-input" value="${contact.address}" placeholder="Address">
+            `;
+
+            cells[3].innerHTML = `
+                <input class="edit-input" value="${contact.instagram}" placeholder="@instagram">
+            `;
+
+            cells[4].innerHTML = `
+                <input class="edit-input" value="${contact.info}" placeholder="Info">
+                <input class="edit-input" value="${contact.tags}" placeholder="Tags">
+            `;
+
+            cells[5].innerHTML = `
+                <textarea class="edit-input" style="height:60px">${contact.contact.replace(/<br>/g, '\n')}</textarea>
+            `;
+
+            cells[0].querySelector('.delete-btn').addEventListener('click', async () => {
+                try {
+                    await contactsRef.doc(contacts[index].id).delete();
+                } catch (error) {
+                    console.error('Error deleting contact:', error);
+                }
+            });
+        }
+
+        // Weitere Funktionen
+        async function addSampleContact() {
+            try {
+                await contactsRef.add({
+                    name: 'MAX MUSTERMANN',
+                    category: 'DANCER',
+                    city: 'BERLIN',
+                    address: 'MUSTERSTRASSE 12, 10115 BERLIN',
+                    instagram: '@maxdance',
+                    info: 'CONTEMPORARY SPECIALIST',
+                    contact: '+49 123 456789<br>max@dance.com',
+                    keywords: 'max dancer tänzer reliable zuverlässig',
+                    tags: 'kreuzberg urban'
+                });
+            } catch (error) {
+                console.error('Error adding sample contact:', error);
+            }
+        }
+
+        async function addNewContact() {
+            try {
+                const docRef = await contactsRef.add({
+                    name: '',
+                    category: '',
+                    city: '',
+                    address: '',
+                    instagram: '',
+                    info: '',
+                    contact: '',
+                    keywords: '',
+                    tags: ''
+                });
+                contacts.push({ id: docRef.id, ...docRef.data() });
+                renderContacts();
+                const newRow = document.querySelector('#contactsTable tbody tr:last-child');
+                if (newRow) enableRowEditing(newRow, contacts.length - 1);
+            } catch (error) {
+                console.error('Error adding new contact:', error);
+            }
+        }
+
+        // Passwortfunktionen
+        function showPasswordPrompt() {
+            passwordOverlay.style.display = 'flex';
+            passwordInput.focus();
+        }
+
+        function checkPassword() {
+            if (passwordInput.value === ADMIN_PASS()) {
+                passwordOverlay.style.display = 'none';
+                passwordInput.value = '';
+                startEditMode();
+            } else {
+                alert('ACCESS DENIED: Invalid admin credentials');
+                passwordInput.value = '';
+            }
+        }
+
+        function cancelPassword() {
+            passwordOverlay.style.display = 'none';
+            passwordInput.value = '';
+        }
+
+        function startEditMode() {
+            editMode = true;
+            editButton.textContent = 'SAVE';
+            addButton.style.display = 'block';
+            renderContacts();
+        }
+
+        // Filterfunktionen
+        function filterContacts() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const locationTerm = document.getElementById('location').value.toLowerCase();
+            
+            document.querySelectorAll('.contact').forEach(contact => {
+                const keywords = contact.dataset.keywords || '';
+                const tags = contact.dataset.tags || '';
+                const cities = contact.dataset.city || '';
+                const instagram = contact.cells[3].textContent.toLowerCase();
+
+                const searchMatch = searchTerm.split(/\s+/).every(term =>
+                    translateTerm(term).some(t => 
+                        keywords.includes(t) || tags.includes(t) || instagram.includes(t)
+                    )
+                );
+
+                const locationMatch = locationTerm.split(/\s+/).every(term =>
+                    translateTerm(term).some(t => cities.includes(t))
+                );
+
+                contact.style.display = searchMatch && locationMatch ? '' : 'none';
+            });
+        }
+
+        function translateTerm(term) {
+            term = term.toLowerCase().trim();
+            return [term, ...(translations[term] || [])];
+        }
+
+        // Event Listener für Adressanzeige
+        document.querySelector('table').addEventListener('click', function(e) {
+            if(e.target.classList.contains('location-toggle') && !editMode) {
+                const addressInfo = e.target.nextElementSibling;
+                addressInfo.style.display = addressInfo.style.display === 'block' ? 'none' : 'block';
+                addressInfo.textContent = e.target.parentElement.parentElement.dataset.address;
+            }
+        });
+    </script>
+</body>
+</html>
