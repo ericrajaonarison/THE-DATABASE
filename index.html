@@ -7,7 +7,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
-        /* CSS remains unchanged from your original */
         * {
             font-family: 'Liberation Mono', monospace !important;
             box-sizing: border-box;
@@ -60,6 +59,7 @@
             border: 2px solid #000;
             font-size: 14px;
             text-transform: uppercase;
+            width: 100%;
         }
 
         .edit-button {
@@ -201,6 +201,22 @@
             .title {
                 text-align: center;
                 font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .search-container {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .search-group {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .search-field {
+                font-size: 13px;
+                padding: 8px;
             }
 
             table, thead, tbody, th, td, tr {
@@ -245,6 +261,21 @@
             tr:hover {
                 background-color: inherit !important;
                 color: inherit !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sticky-header {
+                padding: 0.5rem;
+            }
+            
+            .search-field {
+                font-size: 12px;
+                padding: 6px;
+            }
+            
+            body {
+                padding-top: 140px;
             }
         }
     </style>
